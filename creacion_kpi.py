@@ -5,6 +5,7 @@ import os
 os.system("pip install pyspark")  # Orden del terminal para comprobar que tenemos instalado pyspark 
 import pyspark
 from pyspark.sql import SparkSession
+from pyspark.sql.types import *
 from pyspark.sql.types import IntegerType
 from pyspark.sql.types import DoubleType
 
@@ -13,12 +14,22 @@ spark=SparkSession.builder.appName('Pyspark').getOrCreate()
 spark
 
 # Lectura de datos con SPARK y tabla con los datos de Cards
-cards = spark.read.load("datos\cards.csv",format="csv", sep="|", inferSchema="true", header="true")
+struct = StructType([ \
+    StructField("CP_CLIENTE",StringType(),False), \
+    StructField("CP_COMERCIO",StringType(),False), \
+    StructField("SECTOR",StringType(),False), \
+    StructField("DIA", DateType(), False), \
+    StructField("FRANJA_HORARIA", StringType(), False), \
+    StructField("IMPORTE", DoubleType(), False), \
+    StructField("NUM_OP", IntegerType(), False) \
+  ])
+
+cards = spark.read.load("datos\cards.csv",format="csv", sep="|", schema=struct, header="true")
 #cards.show()
 
 # Conversión de datos del CSV a Integer
-cards = cards.withColumn("IMPORTE", cards["IMPORTE"].cast(DoubleType()))
-cards = cards.withColumn("NUM_OP", cards["NUM_OP"].cast(IntegerType()))
+#cards = cards.withColumn("IMPORTE", cards["IMPORTE"].cast(DoubleType()))
+#data_df = cards.withColumn("NUM_OP", cards["NUM_OP"].cast(IntegerType()))
 
 # Muestra tablas con filtros propios (métodos filter o withColumn)
 #cards.filter(cards.IMPORTE * cards.NUM_OP > 710).show()
@@ -58,3 +69,6 @@ kpi3.show()
 kpi4 = spark.sql("SELECT SECTOR, SUM(NUM_OP), CP_CLIENTE FROM bbdd GROUP BY CP_CLIENTE, SECTOR ORDER BY SUM(NUM_OP) DESC")
 kpi4.show()
 
+
+kpi5 = spark.sql("SELECT sum(IMPORTE), SECTOR FROM bbdd GROUP BY SECTOR ORDER BY sum(IMPORTE) ASC")
+kpi5.show()
