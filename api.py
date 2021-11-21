@@ -1,4 +1,5 @@
 from flask import Flask, jsonify
+from flask_cors import CORS
 import pyspark
 from pyspark.sql import SparkSession
 from pyspark.sql.types import *
@@ -22,12 +23,13 @@ cards.createTempView("bbdd")
 
 
 app = Flask(__name__)
+CORS(app)
 
 @app.route('/ping')
 def ping():
     return 'Pong!'
 
-@app.route('/kpi1')
+@app.route('/kpi1', methods=['GET'])
 def kpi1():
     kpi1 = spark.sql("SELECT SECTOR, SUM(NUM_OP) FROM bbdd GROUP BY SECTOR ORDER BY SUM(NUM_OP) DESC")
     data = ps.DataFrame(kpi1).to_json(orient='records')
