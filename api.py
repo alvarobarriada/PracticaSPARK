@@ -31,31 +31,31 @@ def ping():
 
 @app.route('/kpi1', methods=['GET'])
 def kpi1():
-    kpi1 = spark.sql("SELECT SECTOR, SUM(NUM_OP) FROM bbdd GROUP BY SECTOR ORDER BY SUM(NUM_OP) DESC")
+    kpi1 = spark.sql("SELECT SECTOR, SUM(NUM_OP) AS NUMERO_OPERACIONES, CP_CLIENTE, CP_COMERCIO FROM bbdd GROUP BY SECTOR, CP_CLIENTE, CP_COMERCIO ORDER BY SUM(NUM_OP) DESC")
     data = ps.DataFrame(kpi1).to_json(orient='records')
     return jsonify(data)
 
 @app.route('/kpi2')
 def kpi2():
-    kpi2 = spark.sql("SELECT FRANJA_HORARIA, SUM(NUM_OP) FROM bbdd GROUP BY FRANJA_HORARIA ORDER BY FRANJA_HORARIA ASC")
+    kpi2 = spark.sql("SELECT FRANJA_HORARIA, SUM(NUM_OP) AS NUMERO_OPERACIONES, CP_CLIENTE, CP_COMERCIO, SECTOR FROM bbdd GROUP BY FRANJA_HORARIA, CP_CLIENTE, CP_COMERCIO, SECTOR ORDER BY FRANJA_HORARIA ASC")
     data = ps.DataFrame(kpi2)
     return jsonify(data.to_json(orient='records'))
 
 @app.route('/kpi3')
 def kpi3():
-    kpi3 = spark.sql("SELECT CP_CLIENTE, SUM(NUM_OP) FROM bbdd GROUP BY CP_CLIENTE ORDER BY SUM(NUM_OP) DESC")
+    kpi3 = spark.sql("SELECT CP_CLIENTE, SUM(NUM_OP) AS NUMERO_OPERACIONES FROM bbdd GROUP BY CP_CLIENTE ORDER BY SUM(NUM_OP) DESC")
     data = ps.DataFrame(kpi3)
     return jsonify(data.to_json(orient='records'))
 
 @app.route('/kpi4')
 def kpi4():
-    kpi4 = spark.sql("SELECT SECTOR, SUM(NUM_OP), CP_CLIENTE FROM bbdd GROUP BY CP_CLIENTE, SECTOR ORDER BY SUM(NUM_OP) DESC")
+    kpi4 = spark.sql("SELECT SECTOR, SUM(NUM_OP) AS NUMERO_OPERACIONES, CP_CLIENTE FROM bbdd GROUP BY CP_CLIENTE, SECTOR ORDER BY SUM(NUM_OP) DESC")
     data = ps.DataFrame(kpi4)
     return jsonify(data.to_json(orient='records'))
 
 @app.route('/kpi5')
 def kpi5():
-    kpi5 = spark.sql("SELECT sum(IMPORTE), SECTOR FROM bbdd GROUP BY SECTOR ORDER BY sum(IMPORTE) ASC")
+    kpi5 = spark.sql("SELECT sum(IMPORTE) AS TOTAL, SECTOR, CP_CLIENTE, CP_COMERCIO FROM bbdd GROUP BY SECTOR, CP_CLIENTE, CP_COMERCIO ORDER BY sum(IMPORTE) ASC")
     data = ps.DataFrame(kpi5)
     return jsonify(data.to_json(orient='records'))
 
