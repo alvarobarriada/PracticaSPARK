@@ -8,12 +8,17 @@ import numpy as np
 import requests
 import altair as alt
 
+horas = st.select_slider(
+    'Seleccione una franja horaria',
+    options=['00-02', '02-04', '04-06', '06-08', '08-10', '10-12', '12-14', '14-16', '16-18', '18-20', '20-22', '22-24'])
 
-response = requests.get("http://127.0.0.1:5000/kpi1")
+st.write('La franja horaria seleccionada es', horas)
+
+response = requests.get("http://127.0.0.1:5000/kpi7?horas=%s" % horas)
 print(response.json())
-datos = pd.read_json(response.json())
+kpi7 = pd.read_json(response.json())
 
-bars = alt.Chart(datos).mark_bar().encode(
+bars = alt.Chart(kpi7).mark_bar().encode(
     x = "NUMERO_OPERACIONES:Q",
     y = 'SECTOR:O'
 ).properties(
@@ -21,6 +26,23 @@ bars = alt.Chart(datos).mark_bar().encode(
     height = 300
 )
 st.write(bars)
+
+'''
+En pruebas para coordinarlo con horas
+response = requests.get("http://127.0.0.1:5000/kpi8?horas=%s" % horas)
+print(response.json())
+kpi8 = pd.read_json(response.json())
+
+bars = alt.Chart(kpi8).mark_bar().encode(
+    x = "TOTAL:Q",
+    y = 'MESES:O'
+).properties(
+    width = 550,
+    height = 300
+)
+st.write(bars)
+'''
+
 
 
 
