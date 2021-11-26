@@ -83,5 +83,12 @@ def kpi9():
     data = ps.DataFrame(kpi9)
     return jsonify(data.to_json(orient='records'))
 
+@app.route('/kpi10', methods=['GET'])
+def kpi10():
+    cp = request.args.get('cp')
+    kpi10 = spark.sql("SELECT CP_CLIENTE, CP_COMERCIO, SECTOR, SUM(NUM_OP) AS NUMERO_OPERACIONES FROM bbdd WHERE CP_CLIENTE = '{}' GROUP BY CP_CLIENTE, CP_COMERCIO, SECTOR".format(cp))
+    data = ps.DataFrame(kpi10).to_json(orient='records')
+    return jsonify(data)
+
 if __name__ == '__main__':
     app.run(debug=True)
