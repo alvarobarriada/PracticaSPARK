@@ -27,10 +27,6 @@ cards.createTempView("bbdd")
 app = Flask(__name__)
 CORS(app)
 
-@app.route('/ping')
-def ping():
-    return 'Pong!'
-
 @app.route('/kpi1', methods=['GET'])
 def kpi1():
     kpi1 = spark.sql("SELECT SECTOR, SUM(NUM_OP) AS NUMERO_OPERACIONES, CP_CLIENTE, CP_COMERCIO FROM bbdd GROUP BY SECTOR, CP_CLIENTE, CP_COMERCIO ORDER BY SUM(NUM_OP) DESC")
@@ -77,8 +73,14 @@ def kpi7():
 @app.route('/kpi8', methods=['GET'])
 def kpi8():
     horas = request.args.get('horas')
-    kpi8 = spark.sql("SELECT FRANJA_HORARIA, sum(IMPORTE) AS TOTAL, SECTOR, month(DIA) AS MESES, SECTOR, CP_CLIENTE, CP_COMERCIO FROM bbdd WHERE FRANJA_HORARIA = '{}' GROUP BY FRANJA_HORARIA, CP_CLIENTE, CP_COMERCIO, SECTOR, month(DIA)".format(horas))
+    kpi8 = spark.sql("SELECT FRANJA_HORARIA, sum(IMPORTE) AS TOTAL, SECTOR, month(DIA) AS MESES, CP_CLIENTE, CP_COMERCIO FROM bbdd WHERE FRANJA_HORARIA = '{}' GROUP BY FRANJA_HORARIA, CP_CLIENTE, CP_COMERCIO, SECTOR, month(DIA)".format(horas))
     data = ps.DataFrame(kpi8)
+    return jsonify(data.to_json(orient='records'))
+
+@app.route('/kpi9')
+def kpi9():
+    kpi9 = spark.sql("SELECT CP_CLIENTE, SUM(NUM_OP) AS NUMERO_OPERACIONES, CP_COMERCIO, SECTOR FROM bbdd GROUP BY CP_CLIENTE, CP_COMERCIO, SECTOR ORDER BY SUM(NUM_OP) DESC")
+    data = ps.DataFrame(kpi9)
     return jsonify(data.to_json(orient='records'))
 
 if __name__ == '__main__':
