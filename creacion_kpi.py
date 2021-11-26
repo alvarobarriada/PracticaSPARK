@@ -6,8 +6,7 @@ os.system("pip install pyspark")  # Orden del terminal para comprobar que tenemo
 import pyspark
 from pyspark.sql import SparkSession
 from pyspark.sql.types import *
-from pyspark.sql.types import IntegerType
-from pyspark.sql.types import DoubleType
+from pyspark.sql.functions import month
 
 # SPARK
 spark=SparkSession.builder.appName('Pyspark').getOrCreate()
@@ -72,3 +71,6 @@ kpi4.show()
 
 kpi5 = spark.sql("SELECT sum(IMPORTE), SECTOR FROM bbdd GROUP BY SECTOR ORDER BY sum(IMPORTE) ASC")
 kpi5.show()
+
+kpi6 = spark.sql("SELECT sum(IMPORTE), SECTOR, month(DIA), DIA, CP_CLIENTE, CP_COMERCIO FROM bbdd GROUP BY SECTOR, CP_CLIENTE, CP_COMERCIO, month(DIA), DIA ORDER BY sum(IMPORTE) DESC")
+kpi6.show()

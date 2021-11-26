@@ -1,10 +1,12 @@
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request
 from flask_cors import CORS
 import pyspark
 from pyspark.sql import SparkSession
 from pyspark.sql.types import *
+from pyspark.sql.functions import month
 import pandas
 import pyspark.pandas as ps
+import requests
 
 spark=SparkSession.builder.appName('Pyspark').getOrCreate()
 
@@ -57,6 +59,26 @@ def kpi4():
 def kpi5():
     kpi5 = spark.sql("SELECT sum(IMPORTE) AS TOTAL, SECTOR, CP_CLIENTE, CP_COMERCIO FROM bbdd GROUP BY SECTOR, CP_CLIENTE, CP_COMERCIO ORDER BY sum(IMPORTE) ASC")
     data = ps.DataFrame(kpi5)
+    return jsonify(data.to_json(orient='records'))
+
+@app.route('/kpi6')
+def kpi6():
+    kpi6 = spark.sql("SELECT sum(IMPORTE) AS TOTAL, SECTOR, month(DIA) AS MESES, CP_CLIENTE, CP_COMERCIO FROM bbdd GROUP BY SECTOR, CP_CLIENTE, CP_COMERCIO, month(DIA) ORDER BY sum(IMPORTE) DESC")
+    data = ps.DataFrame(kpi6)
+    return jsonify(data.to_json(orient='records'))
+
+@app.route('/kpi7', methods=['GET'])
+def kpi7():
+    horas = request.args.get('horas')
+    kpi7 = spark.sql("SELECT FRANJA_HORARIA, SUM(NUM_OP) AS NUMERO_OPERACIONES, SECTOR, CP_CLIENTE, CP_COMERCIO FROM bbdd WHERE FRANJA_HORARIA = '{}' GROUP BY FRANJA_HORARIA, CP_CLIENTE, CP_COMERCIO, SECTOR".format(horas))
+    data = ps.DataFrame(kpi7)
+    return jsonify(data.to_json(orient='records'))
+
+@app.route('/kpi8', methods=['GET'])
+def kpi8():
+    horas = request.args.get('horas')
+    kpi8 = spark.sql("SELECT FRANJA_HORARIA, sum(IMPORTE) AS TOTAL, SECTOR, month(DIA) AS MESES, SECTOR, CP_CLIENTE, CP_COMERCIO FROM bbdd WHERE FRANJA_HORARIA = '{}' GROUP BY FRANJA_HORARIA, CP_CLIENTE, CP_COMERCIO, SECTOR, month(DIA)".format(horas))
+    data = ps.DataFrame(kpi8)
     return jsonify(data.to_json(orient='records'))
 
 if __name__ == '__main__':
