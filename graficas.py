@@ -20,9 +20,9 @@ html_header="""
     <meta charset="utf-8">
 </head>
 
-<h1 style="margin-left: 400px;"> TÍTULO PROVISIONAL </h1>
+<h1 style="margin-left: 365px;"> BILLETAJO - ANÁLISIS DE DATOS </h1>
 """
-st.set_page_config(page_title="Billetajo", page_icon="", layout="wide")
+st.set_page_config(page_title="Billetajo - Análisis de datos", page_icon="./media/statistics.png", layout="wide")
 st.markdown(html_header, unsafe_allow_html=True)
 # Estilos generales
 st.markdown(""" <style>
