@@ -26,6 +26,29 @@ struct = StructType([ \
 cards = spark.read.load("datos\cards.csv",format="csv", sep="|", schema=struct, header="true")
 #cards.show()
 
+struct2 = StructType([ \
+    StructField("FECHA",DateType(),False), \
+    StructField("DIA", IntegerType(),False), \
+    StructField("TMax",DoubleType(),False), \
+    StructField("HTMax", StringType(), False), \
+    StructField("TMin", DoubleType(), False), \
+    StructField("HTMin", StringType(), False), \
+    StructField("TMed", DoubleType(), False), \
+    StructField("HumMax", DoubleType(), False), \
+    StructField("HumMin", DoubleType(), False), \
+    StructField("HumMed", DoubleType(), False), \
+    StructField("VelViento", DoubleType(), False), \
+    StructField("DirViento", DoubleType(), False), \
+    StructField("Rad", DoubleType(), False), \
+    StructField("Precip", DoubleType(), False), \
+    StructField("ETo", DoubleType(), False) \
+])
+
+weather = spark.read.load("datos\weather.csv",format="csv", sep=";", schema=struct2, header="true")
+#weather.show()
+
+weather.createTempView("bbdd2")
+
 # Conversión de datos del CSV a Integer
 #cards = cards.withColumn("IMPORTE", cards["IMPORTE"].cast(DoubleType()))
 #data_df = cards.withColumn("NUM_OP", cards["NUM_OP"].cast(IntegerType()))
@@ -40,7 +63,7 @@ cards.groupBy('CP_CLIENTE')
 # Vista del DataFrame para las consultas de los KPIs
 cards.createTempView("bbdd")
 #cards.show()
-
+'''
 # Muestra la lista de sectores
 sectores = spark.sql("SELECT SECTOR FROM bbdd")
 #sectores.show()
@@ -74,3 +97,9 @@ kpi5.show()
 
 kpi6 = spark.sql("SELECT sum(IMPORTE), SECTOR, month(DIA), DIA, CP_CLIENTE, CP_COMERCIO FROM bbdd GROUP BY SECTOR, CP_CLIENTE, CP_COMERCIO, month(DIA), DIA ORDER BY sum(IMPORTE) DESC")
 kpi6.show()
+'''
+
+# Intento de KPI Doble
+# Qué temperatura media había los días en que se hicieron más operaciones
+kpi11 = spark.sql("SELECT bbdd.NUM_OP, bbdd.DIA, bbdd2.TMed FROM bbdd INNER JOIN bbdd2 ON bbdd.DIA = bbdd2.FECHA GROUP BY bbdd.DIA, NUM_OP, bbdd2.TMed ORDER BY NUM_OP DESC")
+kpi11.show()

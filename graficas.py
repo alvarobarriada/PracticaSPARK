@@ -112,6 +112,15 @@ html_card_header4="""
 </div>
 """
 
+html_card_header5="""
+<div class="card">
+  <div class="card-body" style="border-radius: 10px 10px 0px 0px; background: #eef9ea; padding-top: 5px; width: 1200px;
+   height: 50px;">
+    <h3 class="card-title" style="background-color:#eef9ea; color:#008080; font-family:Montserrat; text-align: center; padding: 0px 0;"> Temperatura que hacía el día con más operaciones </h3>
+  </div>
+</div>
+"""
+
 html_br=""" <br> """
 html_blankspace=""" <br> <br><br><br><br><br><br><br><br> """
 
@@ -228,5 +237,32 @@ with st.container():
 
 
 
+##PRUEBAS
+with st.container():
+    col1, col2, col3, col4, col5= st.columns([1,15,1,15,1])
+    with col1:
+        st.write("")
+    with col2:
+        st.markdown(html_card_header5, unsafe_allow_html=True)
+        response = requests.get("http://127.0.0.1:5000/kpi11")
+        print(response.json())
+        kpi11 = pd.read_json(response.json())
 
+        barras = alt.Chart(kpi11).mark_bar().encode(
+            x = "TEMPERATURA:Q",
+            y = 'NUMERO_OPERACIONES:Q'
+        ).properties(
+            width = 1200,
+            height = 400
+        )
+        st.markdown(html_br, unsafe_allow_html=True)
+        st.write(barras)
 
+        st.markdown(html_br, unsafe_allow_html=True)
+    with col3:
+        st.write("")
+
+    with col4:
+        st.write("")
+    with col5:
+        st.write("")

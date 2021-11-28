@@ -1,5 +1,6 @@
 from flask import Flask, jsonify, request
 from flask_cors import CORS
+from numpy import record
 import pyspark
 from pyspark.sql import SparkSession
 from pyspark.sql.types import *
@@ -22,6 +23,29 @@ struct = StructType([ \
 
 cards = spark.read.load("datos\cards.csv",format="csv", sep="|", schema=struct, header="true")
 cards.createTempView("bbdd")
+
+struct2 = StructType([ \
+    StructField("FECHA",DateType(),False), \
+    StructField("DIA", IntegerType(),False), \
+    StructField("TMax",DoubleType(),False), \
+    StructField("HTMax", StringType(), False), \
+    StructField("TMin", DoubleType(), False), \
+    StructField("HTMin", StringType(), False), \
+    StructField("TMed", DoubleType(), False), \
+    StructField("HumMax", DoubleType(), False), \
+    StructField("HumMin", DoubleType(), False), \
+    StructField("HumMed", DoubleType(), False), \
+    StructField("VelViento", DoubleType(), False), \
+    StructField("DirViento", DoubleType(), False), \
+    StructField("Rad", DoubleType(), False), \
+    StructField("Precip", DoubleType(), False), \
+    StructField("ETo", DoubleType(), False) \
+])
+
+weather = spark.read.load("datos\weather.csv",format="csv", sep=";", schema=struct2, header="true")
+#weather.show()
+
+weather.createTempView("bbdd2")
 
 
 app = Flask(__name__)
@@ -114,6 +138,12 @@ def kpi10():
     kpi10 = spark.sql("SELECT CP_CLIENTE, CP_COMERCIO, SECTOR, SUM(NUM_OP) AS NUMERO_OPERACIONES FROM bbdd WHERE CP_CLIENTE = '{}' GROUP BY CP_CLIENTE, CP_COMERCIO, SECTOR".format(cp))
     data = ps.DataFrame(kpi10).to_json(orient='records')
     return jsonify(data)
+
+@app.route('/kpi11')
+def kpi11():
+    kpi11 = spark.sql("SELECT bbdd.NUM_OP, bbdd.DIA, bbdd2.TMed FROM bbdd INNER JOIN bbdd2 ON bbdd.DIA = bbdd2.FECHA GROUP BY bbdd.DIA, NUM_OP, bbdd2.TMed ORDER BY NUM_OP DESC")
+    data = ps.DataFrame(kpi11)
+    return jsonify(data.to_json(orient='records'))
 
 if __name__ == '__main__':
     app.run(debug=True)
