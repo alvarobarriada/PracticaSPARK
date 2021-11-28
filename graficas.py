@@ -143,7 +143,8 @@ with st.container():
         st.write("")
 
     with col4:
-        st.markdown(html_card_param2, unsafe_allow_html=True)
+        st.write("")
+        #st.markdown(html_card_param2, unsafe_allow_html=True)
     
     with col5:
         st.write("")
@@ -253,24 +254,5 @@ with st.container():
         kpi11 = pd.read_json(response.json())
 
         fig = px.pie(kpi11, values='TOTAL', names='MESES', color='TEMPERATURA', color_discrete_sequence=px.colors.sequential.RdBu)
-        fig.update_layout(height=350, width=600)
-        st.plotly_chart(fig)
-
-        barras = alt.Chart(kpi11).mark_bar().encode(
-            x = "TEMPERATURA:Q",
-            y = 'NUMERO_OPERACIONES:Q'
-        ).properties(
-            width = 1200,
-            height = 400
-        )
-        st.markdown(html_br, unsafe_allow_html=True)
-        st.write(barras)
-
-        st.markdown(html_br, unsafe_allow_html=True)
-    with col3:
-        st.write("")
-
-    with col4:
-        st.write("")
-    with col5:
-        st.write("")
+        fig.update_layout(height=500, width=1200)
+        st.plotly_chart(fig)        
