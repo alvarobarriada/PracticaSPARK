@@ -41,18 +41,17 @@ st.markdown(""" <style>
 # HTML de cada recuadro
 html_card_param1="""
 <div class="card">
-  <div class="card-body" style="border-radius: 10px 10px 0px 0px; background: #eef9ea; padding-top: 5px; width: 1200px;
+  <div class="card-body" style="border-radius: 10px 10px 0px 0px; background: #eef9ea; padding-top: 5px; width: 600px;
    height: 50px;">
-    <h3 class="card-title" style="background-color:#eef9ea; color:#008080; font-family:Montserrat; text-align: center; padding: 0px 0;">Código Postal Cliente</h3>
+    <h3 class="card-title" style="background-color:#eef9ea; color:#008080; font-family:Montserrat; text-align: center; padding: 0px 0;">Franja Horaria</h3>
   </div>
 </div>
 """
-
 html_card_param2="""
 <div class="card">
-  <div class="card-body" style="border-radius: 10px 10px 0px 0px; background: #eef9ea; padding-top: 5px; width: 1200px;
+  <div class="card-body" style="border-radius: 10px 10px 0px 0px; background: #eef9ea; padding-top: 5px; width: 600px;
    height: 50px;">
-    <h3 class="card-title" style="background-color:#eef9ea; color:#008080; font-family:Montserrat; text-align: center; padding: 0px 0;">Franja Horaria</h3>
+    <h3 class="card-title" style="background-color:#eef9ea; color:#008080; font-family:Montserrat; text-align: center; padding: 0px 0;"></h3>
   </div>
 </div>
 """
@@ -98,7 +97,7 @@ html_card_header3="""
 <div class="card">
   <div class="card-body" style="border-radius: 10px 10px 0px 0px; background: #eef9ea; padding-top: 5px; width: 600px;
    height: 50px;">
-    <h3 class="card-title" style="background-color:#eef9ea; color:#008080; font-family:Montserrat; text-align: center; padding: 0px 0;">Nº Operaciones por Comercio</h3>
+    <h3 class="card-title" style="background-color:#eef9ea; color:#008080; font-family:Montserrat; text-align: center; padding: 0px 0;">Código Postal Cliente</h3>
   </div>
 </div>
 """
@@ -107,7 +106,7 @@ html_card_header4="""
 <div class="card">
   <div class="card-body" style="border-radius: 10px 10px 0px 0px; background: #eef9ea; padding-top: 5px; width: 600px;
    height: 50px;">
-    <h3 class="card-title" style="background-color:#eef9ea; color:#008080; font-family:Montserrat; text-align: center; padding: 0px 0;">Código Postal Cliente</h3>
+    <h3 class="card-title" style="background-color:#eef9ea; color:#008080; font-family:Montserrat; text-align: center; padding: 0px 0;">Nº Operaciones por Comercio</h3>
   </div>
 </div>
 """
@@ -116,7 +115,7 @@ html_card_header5="""
 <div class="card">
   <div class="card-body" style="border-radius: 10px 10px 0px 0px; background: #eef9ea; padding-top: 5px; width: 1200px;
    height: 50px;">
-    <h3 class="card-title" style="background-color:#eef9ea; color:#008080; font-family:Montserrat; text-align: center; padding: 0px 0;"> Temperatura que hacía el día con más operaciones </h3>
+    <h3 class="card-title" style="background-color:#eef9ea; color:#008080; font-family:Montserrat; text-align: center; padding: 0px 0;"> Temperatura promedio por meses con más importe gastado </h3>
   </div>
 </div>
 """
@@ -126,13 +125,13 @@ html_blankspace=""" <br> <br><br><br><br><br><br><br><br> """
 
 ##Block
 with st.container():
-    col1, col2, col3 = st.columns([1,15,1])
+    col1, col2, col3, col4, col5, = st.columns([1,15,3,15,1])
     with col1:
         st.write("")
     
     with col2:
-        st.markdown(html_card_param2, unsafe_allow_html=True)
-        horas = st.select_slider('', 
+        st.markdown(html_card_param1, unsafe_allow_html=True)
+        horas = st.select_slider('Resultados general: Marcar 00', 
         options=['00','00-02', '02-04', '04-06', '06-08', '08-10', '10-12', '12-14', '14-16', '16-18', '18-20', '20-22', '22-24'])
         st.write('La franja horaria seleccionada es', horas)
 
@@ -141,6 +140,12 @@ with st.container():
         #st.write('Código Postal introducido', cp)
     
     with col3:
+        st.write("")
+
+    with col4:
+        st.markdown(html_card_param2, unsafe_allow_html=True)
+    
+    with col5:
         st.write("")
     
 
@@ -206,7 +211,7 @@ with st.container():
     with col2:
         st.markdown(html_card_header3, unsafe_allow_html=True)
         st.markdown(html_br, unsafe_allow_html=True)
-        cp = st.text_input('','00000')
+        cp = st.text_input('Resultado general: Introducir 00000','00000')
         st.write('Código Postal introducido', cp)
         
 
@@ -236,7 +241,6 @@ with st.container():
         st.write("")
 
 
-
 ##PRUEBAS
 with st.container():
     col1, col2, col3, col4, col5= st.columns([1,15,1,15,1])
@@ -247,6 +251,10 @@ with st.container():
         response = requests.get("http://127.0.0.1:5000/kpi11")
         print(response.json())
         kpi11 = pd.read_json(response.json())
+
+        fig = px.pie(kpi11, values='TOTAL', names='MESES', color='TEMPERATURA', color_discrete_sequence=px.colors.sequential.RdBu)
+        fig.update_layout(height=350, width=600)
+        st.plotly_chart(fig)
 
         barras = alt.Chart(kpi11).mark_bar().encode(
             x = "TEMPERATURA:Q",

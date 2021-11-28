@@ -51,7 +51,7 @@ weather.createTempView("bbdd2")
 app = Flask(__name__)
 CORS(app)
 
-@app.route('/kpi1', methods=['GET'])
+@app.route('/kpi1')
 def kpi1():
     kpi1 = spark.sql("SELECT SECTOR, SUM(NUM_OP) AS NUMERO_OPERACIONES, CP_CLIENTE, CP_COMERCIO FROM bbdd GROUP BY SECTOR, CP_CLIENTE, CP_COMERCIO ORDER BY SUM(NUM_OP) DESC")
     data = ps.DataFrame(kpi1).to_json(orient='records')
@@ -141,8 +141,20 @@ def kpi10():
 
 @app.route('/kpi11')
 def kpi11():
-    kpi11 = spark.sql("SELECT bbdd.NUM_OP, bbdd.DIA, bbdd2.TMed FROM bbdd INNER JOIN bbdd2 ON bbdd.DIA = bbdd2.FECHA GROUP BY bbdd.DIA, NUM_OP, bbdd2.TMed ORDER BY NUM_OP DESC")
+    kpi11 = spark.sql("SELECT sum(bbdd.IMPORTE) AS TOTAL, bbdd.SECTOR, month(bbdd.DIA) AS MESES, bbdd.CP_COMERCIO, avg(bbdd2.TMed) AS TEMPERATURA FROM bbdd INNER JOIN bbdd2 ON month(bbdd.DIA) = month(bbdd2.FECHA) GROUP BY SECTOR,CP_COMERCIO, month(bbdd.DIA)")
     data = ps.DataFrame(kpi11)
+    data['MESES'] = data['MESES'].replace(['1'],'Enero')
+    data['MESES'] = data['MESES'].replace(['2'],'Febrero')
+    data['MESES'] = data['MESES'].replace(['3'],'Marzo')
+    data['MESES'] = data['MESES'].replace(['4'],'Abril')
+    data['MESES'] = data['MESES'].replace(['5'],'Mayo')
+    data['MESES'] = data['MESES'].replace(['6'],'Junio')
+    data['MESES'] = data['MESES'].replace(['7'],'Julio')
+    data['MESES'] = data['MESES'].replace(['8'],'Agosto')
+    data['MESES'] = data['MESES'].replace(['9'],'Septiembre')
+    data['MESES'] = data['MESES'].replace(['10'],'Octubre')
+    data['MESES'] = data['MESES'].replace(['11'],'Noviembre')
+    data['MESES'] = data['MESES'].replace(['12'],'Diciembre')
     return jsonify(data.to_json(orient='records'))
 
 if __name__ == '__main__':
